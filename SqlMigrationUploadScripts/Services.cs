@@ -39,56 +39,15 @@ namespace SqlMigrationUploadScripts
             return pwd;
         }
 
-        public static void CreateSqlTables(string host, string userId, string password, string scriptPath)
-        {
-            
-            var fileList = Directory.GetFiles(scriptPath);
-            var connectionString = "";
-            if(string.IsNullOrEmpty(userId) && string.IsNullOrEmpty(password))
-            {
-                connectionString = $"Server={host};Database=master;Trust Server Certificate=True";
-            }
-            else
-            {
-                connectionString = $"Server={host};Database=master;User ID={userId};Password={password};Trust Server Certificate=True";
-            }
-            
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                ServerConnection serverConnection = new ServerConnection(connection);
-                Server server = new Server(serverConnection);
-                if(server.State != SqlSmoState.Existing)
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine($"Connection to server: ");
-                    Console.ForegroundColor = ConsoleColor.Green;
-                }
-                else
-                {
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine($"\nConnection to the server: {host} is {server.State}");
-                }
-                    
+        
+    }
 
-                foreach (var file in fileList)
-                {
-                    Console.ForegroundColor = ConsoleColor.DarkCyan;
-                    Console.WriteLine($"Executing Script: {Path.GetFileName(file)} on {host}");
-                    try
-                    {
-                        server.ConnectionContext.ExecuteNonQuery(File.ReadAllText(file));
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine(ex.InnerException);
-                        Console.ForegroundColor = ConsoleColor.White;
-                    }
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine($"Script: {Path.GetFileName(file)} has been executed on {host} ");
-                }
-            }
-
-        }
+    public enum DirectoryFolders
+    {
+        DatabaseScripts,
+        TableScripts,
+        ViewScripts,
+        FunctionScripts,
+        StoredProcedureScripts
     }
 }
